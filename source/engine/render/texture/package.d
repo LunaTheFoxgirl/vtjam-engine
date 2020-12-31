@@ -182,6 +182,13 @@ public:
     }
 
     /**
+        Gets the center of the sprite
+    */
+    vec2 center() {
+        return vec2(width_/2, height_/2);
+    }
+
+    /**
         Set the filtering mode used for the texture
     */
     void setFiltering(Filtering filtering) {
