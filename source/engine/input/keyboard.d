@@ -199,7 +199,7 @@ public:
         Gets whether a key is not pressed
     */
     bool isKeyUp(Key key) {
-        return keyStates[key];
+        return !keyStates[key];
     }
 }
 
