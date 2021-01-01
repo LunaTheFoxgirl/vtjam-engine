@@ -64,7 +64,7 @@ struct RectImpl(T) if (isNumeric!T) {
     /**
         Gets whether a 2D vector intersects with this rectangle
     */
-    bool intersects(T)(T other) if(is_vector!T && T.dimensons == 2) {
+    bool intersects(T)(T other) if(is_vector!T && T.vector.length == 2) {
         return !(
             other.x >= this.right || 
             other.x < this.left || 
@@ -82,6 +82,18 @@ struct RectImpl(T) if (isNumeric!T) {
             other.right <= this.left || 
             other.top >= this.bottom || 
             other.bottom <= this.top
+        );
+    }
+
+    /**
+        Gets whether this rectangle entirely contains the other rectangle
+    */
+    bool contains(RectImpl!T other) {
+        return (
+            other.left > this.left &&
+            other.right < this.right &&
+            other.top > this.top &&
+            other.bottom < this.bottom
         );
     }
 
