@@ -8,6 +8,7 @@
 */
 module engine.i18n;
 import std.exception;
+import asdf;
 
 // Translation ID
 private struct transidx {
@@ -30,7 +31,6 @@ __gshared private string[transidx] transtable;
 private void genLangList() {
     import std.path;
     import std.file : dirEntries, SpanMode, isDir, exists, mkdir, DirEntry, readText;
-    import vibe.data.json : Json, parseJsonString;
 
     // Create an empty language directory if none exists already.
     if (!exists("lang/")) mkdir("lang/");
@@ -41,8 +41,8 @@ private void genLangList() {
         // Skip any stray directories
         if (trFile.isDir) continue;
 
-        Json jsonObject = parseJsonString(readText(trFile.name));
-        string langName = jsonObject["name"].get!string;
+        Asdf jsonObject = parseJson(readText(trFile.name));
+        string langName = jsonObject["name"].get!string(null);
 
         langList[langName] = trFile;
     }
@@ -63,7 +63,6 @@ string[] getLanguages() {
     Sets the current language
 */
 void language(string language) {
-    import vibe.data.json : deserializeJson;
     import std.file : readText, exists;
     import std.path : buildPath, setExtension;
     import std.string : split;
@@ -73,7 +72,7 @@ void language(string language) {
 
     // Read and parse the json
     string json = langList[language].readText();
-    LangFile table = deserializeJson!LangFile(json);
+    LangFile table = deserialize!LangFile(json);
     
     // Iterate over all the keys and build the LangFile object from it
     foreach(idx, str; table.table) {
