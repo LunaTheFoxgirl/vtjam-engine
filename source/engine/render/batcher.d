@@ -152,7 +152,7 @@ public:
 
         // Get the area of the texture with a tiny bit cut off to avoid textures bleeding in to each other
         // TODO: add a 1x1 px transparent border around textures instead?
-        enum cutoffOffset = 0.8;
+        enum cutoffOffset = 0.05;
         enum cutoffAmount = cutoffOffset*2;
 
         vec4 uvArea = vec4(
