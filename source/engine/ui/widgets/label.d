@@ -1,85 +1,67 @@
-/*
-    Copyright © 2020, Luna Nielsen
-    Distributed under the 2-Clause BSD License, see LICENSE file.
-    
-    Authors: Luna Nielsen
-*/
 module engine.ui.widgets.label;
 import engine.ui;
 import engine;
 
 /**
-    A label
+    A text based button
 */
 class Label : Widget {
 private:
+    dstring label;
+    vec2 boxSize;
+    vec4 color;
+    int fontSize = 16;
 
-protected:
-    override {
-        /**
-            Code run when updating the widget
-        */
-        void onUpdate() { }
-
-        /**
-            Code run when drawing
-        */
-        void onDraw() {
-            GameFont.setSize(size);
-            GameFont.draw(this.text, vec2(area.x, area.y));
-            GameFont.flush();
-        }
-    }
-    
 public:
 
     /**
-        The text buffer for the label
+        Sets the text of the label
     */
-    dstring text;
-
-    /**
-        The font size
-    */
-    int size = 24;
-
-    this(T)(T text, int size = 24) if (isString!T) {
-        super("Label");
-
-        this.text = text.toEngineString();
-        this.size = size;
+    void setText(string text) {
+        GameFont.setSize(fontSize);
+        this.label = toEngineString(text);
+        boxSize = GameFont.measure(this.label);
+        UI.resetTextSize();
     }
 
     /**
-        Set the text of the label
-        This function supports UTF8 text
+        Instantiates a button
     */
-    void setText(T)(T text) if (isString!T) {
-        this.text = text.toEngineString();
+    this(string label, vec2i loc, int size = 16, vec4 color = vec4(1)) {
+        super("Label", vec2i(loc.x, loc.y));
+        this.fontSize = size;
+        this.interactible = false;
+        this.color = color;
+
+        // Set the text of the label
+        this.setText(label);
     }
 
-override:
+    // This thing does nothing
+    override void onUpdate() { }
 
-    /**
-        Area of the widget
-    */
-    vec4 area() {
-        vec4 sArea = scissorArea();
-        return vec4(sArea.x-4, sArea.y-4, sArea.z+8, sArea.w+8);
+    override void onDraw() {
+        GameFont.setSize(fontSize);
+        GameFont.draw(label, vec2(this.actualPosition()), color);
+        GameFont.flush();
+
+        // Reset text size so other elements don't get scaled up weirdly
+        UI.resetTextSize();
+    }
+    
+    override void onActivate() {
+        color = vec4(0.8, 0.8, 0.1, 1);
     }
 
-    /**
-        Area in which the widget cuts out child widgets
-    */
-    vec4i scissorArea() {
-        GameFont.setSize(size);
-        vec2 measure = GameFont.measure(text);
-        vec2 pos = this.calculatedPosition();
-        return vec4i(
-            cast(int)pos.x, 
-            cast(int)pos.y, 
-            cast(int)measure.x, 
-            cast(int)measure.y
-        );
+    override void onHover() {
+        color = vec4(0.8, 0.8, 0.05, 1);
+    }
+
+    override void onLeave() {
+        color = vec4(1, 1, 1, 1);
+    }
+
+    override vec2 getSize() {
+        return boxSize;
     }
 }

@@ -5,6 +5,7 @@
     Authors: Luna Nielsen
 */
 module engine.ui.widget;
+import engine.ui.surface;
 import engine;
 import std.algorithm.mutation : remove;
 import bindbc.opengl;
@@ -12,42 +13,42 @@ import std.exception;
 import std.format;
 
 /**
+    The different states a widget can be in
+*/
+enum WidgetState {
+    /**
+        When the widget is normal
+    */
+    Normal,
+
+    /**
+        When the widget is hovered
+    */
+    Hover,
+
+    /**
+        When the widget is selected
+    */
+    Activated
+}
+
+/**
     A widget
 */
 abstract class Widget {
 private:
     string typeName;
-    Widget parent_;
-    Widget[] children;
-
-    ptrdiff_t findSelfInParent() {
-        
-        // Can't find self if we don't have a parent
-        if (parent_ is null) return -1;
-
-        // Iterate through parent's children and find our instance
-        foreach(i, widget; parent_.children) {
-            if (widget == this) return i;
-        }
-
-        // We couldn't find ourselves?
-        AppLog.warn("UI", "Widget %s could not find self in parent", this);
-        return -1;
-    }
+    WidgetSurface surface;
 
 protected:
-    /**
-        The parent widget
-    */
-    Widget parent() {
-        return parent_;
-    }
+    WidgetState state;
 
     /**
         Base widget instance requires type name
     */
-    this(string type) {
+    this(string type, vec2i position) {
         this.typeName = type;
+        this.position = position;
     }
 
     /**
@@ -59,8 +60,51 @@ protected:
         Code run when drawing
     */
     abstract void onDraw();
+    
+    /**
+        Called when activated
+    */
+    abstract void onActivate();
+    
+    /**
+        Called when activated
+    */
+    abstract void onHover();
+    
+    /**
+        Called when activated
+    */
+    abstract void onLeave();
+
+    /**
+        Whether the widget should accept inputs
+    */
+    bool shouldTakeInput() {
+        return state == WidgetState.Hover;
+    }
+
+package(engine.ui):
+    void setState(WidgetState state) {
+        this.state = state;
+    }
+
+    void setSurface(WidgetSurface surface) {
+        this.surface = surface;
+    }
 
 public:
+
+    /**
+        Gets the state of the widget
+    */
+    WidgetState getState() {
+        return state;
+    }
+
+    /**
+        Whether the widget can be interacted with
+    */
+    bool interactible = true;
 
     /**
         Whether the widget is visible
@@ -70,53 +114,26 @@ public:
     /**
         The position of the widget
     */
-    vec2 position = vec2(0);
-
-    /**
-        Changes the parent of a widget to the specified other widget.
-    */
-    void changeParent(Widget newParent) {
-
-        // Once we're done we need to update our bounds
-        // We'll skip this if we threw an exception earlier
-        scope(success) update();
-        
-        // Remove ourselves from our current parent if we have any
-        if (parent_ !is null) {
-
-            // Find ourselves in our parent
-            ptrdiff_t self = findSelfInParent();
-            enforce(self >= 0, "Invalid parent widget");
-
-            // Remove ourselves from our current parent
-            parent_.children.remove(self);
-        }
-
-        // If our new parent is null we'll end early
-        if (newParent is null) {
-            this.parent_ = null;
-            return;
-        }
-
-        // Set our parent to our new parent and add ourselves to our new parent's list
-        this.parent_ = newParent;
-        this.parent_.children ~= this;
-    }
+    vec2i position = vec2i(0);
 
     /**
         Update the widget
 
         Automatically updates all the children first
     */
-    void update() {
-        
-        // Update all our children
-        foreach(child; children) {
-            child.update();
-        }
-
+    final void update() {
         // Update ourselves
         this.onUpdate();
+    }
+
+    /**
+        Gets the position in relation to the surface this widget is on
+    */
+    vec2i actualPosition() {
+        return vec2i(
+            cast(int)(position.x+surface.area.x),
+            cast(int)(position.y+(surface.area.y-surface.getScroll()))
+        );
     }
 
     /**
@@ -129,49 +146,38 @@ public:
         // Don't draw this widget or its children if we're invisible
         if (!visible) return;
 
-        if (parent_ is null) UI.setScissor(vec4i(0, 0, GameWindow.width, GameWindow.height));
-
         // Draw ourselves first
         this.onDraw();
-
-        // We set our scissor rectangle to our rendering area
-        UI.setScissor(scissorArea);
-
-        // Draw all the children
-        foreach(child; children) {
-            child.draw();
-        }
     }
 
     /**
-        Gets the calculated position of the widget
+        Call to activate the widget
     */
-    final vec2 calculatedPosition() {
-        return parent_ !is null ? parent_.calculatedPosition+position : position;
+    final void activate() { 
+
+        // Activating will always set the activated state
+        this.setState(WidgetState.Activated);
+
+        onActivate();
+
+        // We should generally be hovering once we're done
+        // Though in case calling this activation has changed the widget state
+        // We don't want to tramble on it
+        if (state == WidgetState.Activated) this.setState(WidgetState.Hover);
     }
 
-    abstract {
+    /**
+        Tell the widget it has been hovered over
+    */
+    final void hover() { onHover(); }
 
-        /**
-            Area of the widget
-        */
-        vec4 area();
+    /**
+        Tell the wiget that we have left them
+    */
+    final void leave() { onLeave(); }
 
-        /**
-            Area in which the widget cuts out child widgets
-        */
-        vec4i scissorArea();
-    }
-
-    override {
-
-        /**
-            Gets this widget as a string
-
-            This returns the tree for this instance of the widget ordered by type name.
-        */
-        final string toString() const {
-            return parent_ is null ? typeName : "%s->%s".format(parent_.toString, typeName);
-        }
-    }
+    /**
+        Calculate and get size of widget
+    */
+    abstract vec2 getSize();
 }
