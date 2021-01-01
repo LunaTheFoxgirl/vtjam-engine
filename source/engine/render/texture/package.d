@@ -84,7 +84,31 @@ public:
 
         // Load image from disk, as RGBA 8-bit
         IFImage image = read_image(file, 4, 8);
-        enforce( image.e == 0, "%s: %s".format(IF_ERROR[image.e], file));
+        enforce( image.e == 0, "%s: %s".format(IF_ERROR[image.e], file) );
+        scope(exit) image.free();
+
+        // Copy data from IFImage to this ShallowTexture
+        this.data = new ubyte[image.buf8.length];
+        this.data[] = image.buf8;
+
+        // Set the width/height data
+        this.width = image.w;
+        this.height = image.h;
+    }
+
+    /**
+        Loads a shallow texture from image file stored in memory
+        Supported file types:
+        * PNG 8-bit
+        * BMP 8-bit
+        * TGA 8-bit non-palleted
+        * JPEG baseline
+    */
+    this(ubyte[] buff) {
+
+        // Load image from disk, as RGBA 8-bit
+        IFImage image = read_image(buff, 4, 8);
+        enforce( image.e == 0, "%s: (memory buffer)".format(IF_ERROR[image.e]) );
         scope(exit) image.free();
 
         // Copy data from IFImage to this ShallowTexture
@@ -124,6 +148,25 @@ public:
         // Load image from disk, as RGBA 8-bit
         IFImage image = read_image(file, 4, 8);
         enforce( image.e == 0, "%s: %s".format(IF_ERROR[image.e], file));
+        scope(exit) image.free();
+
+        // Load in image data to OpenGL
+        this(image.buf8, image.w, image.h);
+    }
+
+    /**
+        Loads texture from image file
+        Supported file types:
+        * PNG 8-bit
+        * BMP 8-bit
+        * TGA 8-bit non-palleted
+        * JPEG baseline
+    */
+    this(ubyte[] buff) {
+
+        // Load image from disk, as RGBA 8-bit
+        IFImage image = read_image(buff, 4, 8);
+        enforce( image.e == 0, "%s: (memory buffer)".format(IF_ERROR[image.e]) );
         scope(exit) image.free();
 
         // Load in image data to OpenGL

@@ -44,6 +44,22 @@ public static:
 }
 
 /**
+    Initializes surface
+*/
+package(engine) void initSurface() {
+    surfaceTex = new Texture(cast(ubyte[])import("border.png"));
+    surfaceTex.setFiltering(Filtering.Point);
+    borderTileSize = surfaceTex.height/3;
+    borderOffset = borderTileSize/2;
+}
+
+private {
+    int borderOffset;
+    int borderTileSize;
+    Texture surfaceTex;
+}
+
+/**
     A surface where widgets are on
 */
 class WidgetSurface {
@@ -58,6 +74,8 @@ protected:
         import std.algorithm.sorting : sort;
         children.getArray().sort!"a.position.y < b.position.y";
     }
+
+    bool showBorder;
 
 public:
     /**
@@ -79,6 +97,10 @@ public:
         return area.displace(cast(int)scrollOffset, 0);
     }
 
+    void setShowBorder(bool show) {
+        this.showBorder = show;
+    }
+
     /**
         Gets the area of the content inside the surface
 
@@ -94,9 +116,10 @@ public:
     /**
         Constructor
     */
-    this(Rect area, Widget[] children = null) {
+    this(Rect area, Widget[] children = null, bool showBorder = true) {
         this.area = area;
         this.scrollOffset = 0;
+        this.showBorder = showBorder;
 
         foreach(child; children) this.add(child);
     }
@@ -123,10 +146,76 @@ public:
     /**
         Draws the surface
     */
-    void draw() {
+    void draw() { 
+
+        if (showBorder) {
+            // Top left
+            GameBatch.draw(
+                surfaceTex, 
+                vec4(area.left-borderOffset, area.top-borderOffset, borderTileSize, borderTileSize), 
+                vec4(0, 0, borderTileSize, borderTileSize)
+            );
+
+            // Top right
+            GameBatch.draw(
+                surfaceTex, 
+                vec4(area.right-borderOffset, area.top-borderOffset, borderTileSize, borderTileSize), 
+                vec4(borderTileSize*2, 0, borderTileSize, borderTileSize)
+            );
+
+            // Bottom left
+            GameBatch.draw(
+                surfaceTex, 
+                vec4(area.left-borderOffset, area.bottom-borderOffset, borderTileSize, borderTileSize), 
+                vec4(0, borderTileSize*2, borderTileSize, borderTileSize)
+            );
+
+            // Bottom right
+            GameBatch.draw(
+                surfaceTex, 
+                vec4(area.right-borderOffset, area.bottom-borderOffset, borderTileSize, borderTileSize), 
+                vec4(borderTileSize*2, borderTileSize*2, borderTileSize, borderTileSize)
+            );
+
+            // Top
+            GameBatch.draw(
+                surfaceTex, 
+                vec4(area.left+borderOffset, area.top-borderOffset, area.width-borderTileSize, borderTileSize), 
+                vec4(borderTileSize, 0, borderTileSize, borderTileSize)
+            );
+
+            // Right
+            GameBatch.draw(
+                surfaceTex, 
+                vec4(area.right-borderOffset, area.top+borderOffset, borderTileSize, area.height-borderTileSize), 
+                vec4(borderTileSize*2, borderTileSize, borderTileSize, borderTileSize)
+            );
+
+            // Bottom
+            GameBatch.draw(
+                surfaceTex, 
+                vec4(area.left+borderOffset, area.bottom-borderOffset, area.width-borderTileSize, borderTileSize), 
+                vec4(borderTileSize, borderTileSize*2, borderTileSize, borderTileSize)
+            );
+
+            // Left
+            GameBatch.draw(
+                surfaceTex, 
+                vec4(area.left-borderOffset, area.top+borderOffset, borderTileSize, area.height-borderTileSize), 
+                vec4(0, borderTileSize, borderTileSize, borderTileSize)
+            );
+
+            // Fill
+            GameBatch.draw(
+                surfaceTex, 
+                vec4(area.left+borderOffset, area.top+borderOffset, area.width-borderTileSize, area.height-borderTileSize), 
+                vec4(borderTileSize, borderTileSize, borderTileSize, borderTileSize)
+            );
+            GameBatch.flush();
+        }
+
         UI.begin();
         UI.setScissor(area);
-        kmClearColor(vec4(0.2, 0.2, 0.2, 1));
 
         // Draw all the children
         foreach(child; children) {
