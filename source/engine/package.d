@@ -52,15 +52,12 @@ void initEngine() {
     initFontSystem();
     AppLog.info("Engine", "Font system initialized...");
 
-    // Initialize input
-    // initInput(GameWindow.winPtr);
-    // AppLog.info("Engine", "Input system initialized...");
-
     // Initialize atlasser
     GameAtlas = new AtlasCollection();
     AppLog.info("Engine", "Texture atlassing initialized...");
 
     // Initialize subsystems
+    initSurface();
     AppLog.info("Engine", "Intialized internal state for renderer...");
 }
 
