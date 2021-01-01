@@ -98,6 +98,8 @@ public:
 
         glBindTexture(GL_TEXTURE_2D, color);
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, realsize.x, realsize.y, 0, GL_RGBA, GL_UNSIGNED_BYTE, null);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
         glBindRenderbuffer(GL_RENDERBUFFER, depth);
         glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, realsize.x, realsize.y);
