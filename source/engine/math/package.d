@@ -18,11 +18,12 @@ public import gl3n.aabb;
 public import gl3n.interpolate;
 import engine.core.log;
 import gl3n.util : is_vector;
+import std.traits;
 
 /**
     Smoothly dampens from a position to a target
 */
-T dampen(T)(T pos, T target, float delta, float speed = 1) if(is_vector!T) {
+T dampen(T)(T pos, T target, float delta, float speed = 1) if(is_vector!T || isFloatingPoint!T) {
     return (pos - target) * pow(1e-4f, delta*speed) + target;
 }
 
