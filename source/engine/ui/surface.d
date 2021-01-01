@@ -174,8 +174,6 @@ private:
         // The size of the content
         Rect contentArea = getContentArea();
 
-        writeln(widgetPosition, " ", widgetSize);
-
         // If the widget top or bottom is outside the viewport
         // Note: I'm not sure why but we need to add 8 pixels to the widget size
         if (scrollOffset+viewport.height <= widgetPosition.y+widgetSize.y ||
