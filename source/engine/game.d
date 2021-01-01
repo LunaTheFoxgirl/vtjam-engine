@@ -8,9 +8,9 @@ module engine.game;
 import bindbc.sdl;
 import engine;
 
-private double previousTime_;
-private double currentTime_;
-private double deltaTime_;
+private double previousTime_ = 0;
+private double currentTime_ = 0;
+private double deltaTime_ = 0;
 
 private Framebuffer framebuffer;
 
@@ -52,6 +52,7 @@ void startGame(vec2i viewportSize = vec2i(1920, 1080)) {
 
         // Pump events for this update cycle
         SDL_PumpEvents();
+        UI.update();
 
         currentTime_ = cast(double)SDL_GetPerformanceCounter()/cast(double)SDL_GetPerformanceFrequency();
         deltaTime_ = currentTime_-previousTime_;
