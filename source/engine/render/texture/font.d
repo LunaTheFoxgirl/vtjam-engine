@@ -63,7 +63,29 @@ void initFontSystem() {
     vp = fontShader.getUniformLocation("vp");
 
     // The game's font
-    GameFont = new Font(cast(ubyte[])import("fonts/KosugiMaru.ttf"), 24);
+    kmSwitchFont("dragonquestfc");
+}
+
+/**
+    Switches the font between several built in fonts
+    This causes the font to be rebuilt
+*/
+void kmSwitchFont(string name) {
+    import engine.res.skullboy : skullboyData;
+    switch(name) {
+        case "kosugimaru":
+            GameFont = new Font(cast(ubyte[])import("fonts/KosugiMaru.ttf"), 24);
+            break;
+
+        case "dragonquestfc":
+            GameFont = new Font(cast(ubyte[])import("fonts/DragonQuestFC.ttf"), 24);
+            break;
+
+        case "skullboy":
+        default:
+            GameFont = new Font(skullboyData, 24);
+            break;
+    }
 }
 
 /**
@@ -152,6 +174,7 @@ private:
 
         // Create the texture
         fontTexture = new Texture(canvasSize, canvasSize, GL_RED, 1);
+        fontTexture.setFiltering(Filtering.Point);
         fontPacker = new TexturePacker(vec2i(canvasSize, canvasSize));
 
         glBindVertexArray(vao);
@@ -241,7 +264,8 @@ public:
 
         // Set the size of the font
         FT_Set_Pixel_Sizes(fontFace, 0, size);
-        metrics = vec2(size, fontFace.size.metrics.height >> 6);
+
+        metrics = vec2(size, (fontFace.size.metrics.height >> 6));
         this.size = size;
     }
 
