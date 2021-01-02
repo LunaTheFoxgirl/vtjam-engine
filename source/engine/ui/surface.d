@@ -9,6 +9,7 @@ import std.stdio;
 static class SurfaceStack {
 private static:
     List!WidgetSurface surfaces;
+    bool blocked = false;
 
 public static:
 
@@ -26,13 +27,21 @@ public static:
         surfaces.popBack;
     }
 
+    void block() {
+        this.blocked = true;
+    }
+
+    void unblock() {
+        this.blocked = false;
+    }
+
     /**
         Updates the last surface
     */
     void update() {
         if (surfaces.count == 0) return;
         
-        surfaces.back().update();
+        if (!blocked) surfaces.back().update();
     }
 
     /**
@@ -49,6 +58,9 @@ public static:
     Initializes surface
 */
 package(engine) void initSurface() {
+    sfxSelect = new Sound("assets/sfx/menu_select.ogg");
+    //sfxMove = new Sound("assets/sfx/menu_move.ogg");
+
     surfaceTex = new Texture(cast(ubyte[])import("border.png"));
     surfaceTex.setFiltering(Filtering.Point);
     borderTileSize = surfaceTex.height/3;
@@ -59,6 +71,22 @@ private {
     int borderOffset;
     int borderTileSize;
     Texture surfaceTex;
+    Sound sfxSelect;
+    Sound sfxMove;
+}
+
+/**
+    Play selection sound
+*/
+void kmPlaySelect() {
+    sfxSelect.play();
+}
+
+/**
+    Play move sound
+*/
+void kmPlayMove() {
+    sfxMove.play();
 }
 
 /**

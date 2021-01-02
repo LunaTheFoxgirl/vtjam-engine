@@ -9,12 +9,16 @@ class TextButton : Widget {
 private:
     dstring label;
     vec2 size;
-    vec4 color;
 
     void delegate() activateFunc;
     void delegate() hoverFunc;
 
 public:
+    /**
+        Color of the button
+    */
+    vec4 color;
+
     /**
         Sets the text of the label
     */
@@ -56,6 +60,7 @@ public:
     }
     
     override void onActivate() {
+        kmPlaySelect();
         color = vec4(0.8, 0.8, 0.1, 1);
         if (activateFunc !is null) activateFunc();
     }

@@ -9,10 +9,13 @@ class Label : Widget {
 private:
     dstring label;
     vec2 boxSize;
-    vec4 color;
     int fontSize = 16;
 
 public:
+    /**
+        Color of the label
+    */
+    vec4 color;
 
     /**
         Sets the font size
@@ -58,17 +61,9 @@ public:
         UI.resetTextSize();
     }
     
-    override void onActivate() {
-        color = vec4(0.8, 0.8, 0.1, 1);
-    }
-
-    override void onHover() {
-        color = vec4(0.8, 0.8, 0.05, 1);
-    }
-
-    override void onLeave() {
-        color = vec4(1, 1, 1, 1);
-    }
+    override void onActivate() { }
+    override void onHover() { }
+    override void onLeave() { }
 
     override vec2 getSize() {
         return boxSize;

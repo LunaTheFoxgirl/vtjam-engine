@@ -36,6 +36,8 @@ private:
     TextButton japaneseButton;
 
     string chosenLanguage;
+    float fade = 0;
+    bool done = false;
 
     void onHoverEnglish() {
         if (surface is null) return;
@@ -54,10 +56,10 @@ private:
     }
 
     void onLanguageSelected() {
+        done = true;
         // Save to config and close the language selection
         kmSaveConfig();
-        GameStateManager.pop();
-        SurfaceStack.pop();
+        SurfaceStack.block();
     }
 
 public:
@@ -87,6 +89,18 @@ public:
     }
 
     override void update() {
+        if (done) {
+            fade = dampen(fade, 0, deltaTime(), 1);
+            if (fade < 0.001) {
+                GameStateManager.pop();
+                SurfaceStack.pop();
+            }
+        } else {
+            fade = dampen(fade, 1, 0.004, 1);
+        }
+        selectLanguageLabel.color.w = fade;
+        englishButton.color.w = fade;
+        japaneseButton.color.w = fade;
 
     }
 
