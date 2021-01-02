@@ -9,8 +9,13 @@ module config;
     GENERAL CONFIG
 */
 
-enum BaseMusicVolume = 0.5;
-enum BaseSFXVolume = 0.5;
+/**
+    Speed multiplier
+*/
+enum SPEED_MULT = 60;
+
+enum BaseMusicVolume = 0; //0.5;
+enum BaseSFXVolume = 0; //0.5;
 
 /*
     VIEWPORT CONFIGURATION
@@ -59,13 +64,47 @@ enum TARGET_HEIGHT = PlayfieldHeight;
     PLAYER CONFIGURATION
 */
 
-
 /**
     The speed of the player
 */
-enum PlayerSpeed = 15.0;
+enum PlayerSpeed = 2*SPEED_MULT;
+
+/**
+    Slowdown factor when going slow
+*/
+enum PlayerSlowFactor = 2;
 
 /**
     How many bombs the player can carry
 */
 enum BombCountLimit = 5;
+
+/**
+    Second cooldown per bullet fire
+*/
+enum PlayerBulletCooldown = 0.10;
+
+/**
+    Second cooldown per grace event
+*/
+enum PlayerGrazeCooldown = 5;
+
+/**
+    Cooldown before bomb dissapates
+*/
+enum PlayerBombCooldown = 5;
+
+/**
+    Radius of bomb explosion
+*/
+enum PlayerBombRadius = 24.0;
+
+/**
+    Distance from player center that bullets can collide with
+*/
+enum PlayerHitCircleRadius = 2.0;
+
+/**
+    Distance from the player center that graze can happen
+*/
+enum PlayerGrazeCircleRadius = 4.0;

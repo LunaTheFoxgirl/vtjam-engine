@@ -56,7 +56,7 @@ void startGame(vec2i viewportSize = vec2i(1920, 1080)) {
         SDL_PumpEvents();
         UI.update();
 
-        currentTime_ = (cast(double)SDL_GetPerformanceCounter()/cast(double)SDL_GetPerformanceFrequency())*10;
+        currentTime_ = cast(double)SDL_GetPerformanceCounter()/cast(double)SDL_GetPerformanceFrequency();
         deltaTime_ = currentTime_-previousTime_;
         previousTime_ = currentTime_;
         

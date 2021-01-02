@@ -5,20 +5,20 @@ import std.format;
 
 class InGameState : GameState {
 private:
-    Map map;
+    Stage stage;
 
 public:
 
     override void onActivate() {
-        map = new Map();
+        stage = new Stage();
     }
 
     override void update() {
-        map.update();
+        stage.update();
     }
 
     override void draw() {
         kmClearColor(vec4(0.7, 0.7, 0.7, 1));
-        map.draw();
+        stage.draw();
     }
 }

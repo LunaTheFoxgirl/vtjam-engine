@@ -7,6 +7,9 @@ import std.format;
 void _init() {
     if (!kmLoadConfig()) GameStateManager.push(new LanguageSelectState);
     else GameStateManager.push(new InGameState);
+
+    GameWindow.title = "Bullet Hell";
+    GameWindow.setSwapInterval(SwapInterval.Adaptive);
 }
 
 void _update() {
@@ -30,7 +33,7 @@ void _border() {
 void _postUpdate() {
 
     UI.resetTextSize();
-    GameFont.draw("%sms"d.format(cast(int)(deltaTime()*100)), vec2(4, 4));
+    GameFont.draw("%sms"d.format(cast(int)(deltaTime()*1000)), vec2(4, 4));
     GameFont.flush();
 }
 
@@ -45,7 +48,7 @@ int main() {
 
     // Init engine start the game and then close the engine once the game quits
     initEngine();
-    startGame(vec2i(TARGET_WIDTH, TARGET_HEIGHT));
+    startGame(vec2i(PlayfieldWidth, TARGET_HEIGHT));
     closeEngine();
     return 0;
 }
