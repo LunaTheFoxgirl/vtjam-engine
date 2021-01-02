@@ -7,6 +7,7 @@
     Authors: Luna Nielsen
 */
 module engine.render;
+import engine;
 public import bindbc.opengl;
 public import engine.render.shader;
 public import engine.render.texture;

@@ -45,6 +45,8 @@ void function() gameCleanup;
     viewportSize sets the desired viewport size for the framebuffer, defaults to 1080p (1920x1080)
 */
 void startGame(vec2i viewportSize = vec2i(1920, 1080)) {
+    // So that any initialization code relying on viewport size can work
+    kmViewport(0, 0, viewportSize.x, viewportSize.y);
     gameInit();
 
     framebuffer = new Framebuffer(GameWindow, viewportSize);

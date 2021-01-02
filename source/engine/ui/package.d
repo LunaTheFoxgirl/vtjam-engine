@@ -44,7 +44,7 @@ public static:
         Resets the scale of text elements
     */
     static void resetTextSize() {
-        GameFont.setSize(16);
+        GameFont.setSize(kmGetDefaultFontSize());
     }
     
     /**

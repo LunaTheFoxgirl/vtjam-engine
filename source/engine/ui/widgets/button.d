@@ -12,6 +12,7 @@ private:
     vec4 color;
 
     void delegate() activateFunc;
+    void delegate() hoverFunc;
 
 public:
     /**
@@ -26,10 +27,11 @@ public:
     /**
         Instantiates a button
     */
-    this(string label, vec2i loc = vec2i(0), void delegate() activateFunc = null) {
+    this(string label, vec2i loc = vec2i(0), void delegate() activateFunc = null, void delegate() hoverFunc = null) {
         super("Button", vec2i(loc.x, loc.y));
 
         this.activateFunc = activateFunc;
+        this.hoverFunc = hoverFunc;
         this.setText(label);
 
         // We want to set color to "disabled" if the widget is disabled
@@ -60,6 +62,7 @@ public:
 
     override void onHover() {
         color = vec4(0.8, 0.8, 0.05, 1);
+        if (hoverFunc !is null) hoverFunc();
     }
 
     override void onLeave() {

@@ -1,0 +1,9 @@
+{
+    "name": "Japanese",
+    "font": "pixelmplus",
+    "table": {
+        "langselect.d:8": "言語を選択してください",
+        "langselect.d:9": "英語",
+        "langselect.d:10": "日本語"
+    }
+}

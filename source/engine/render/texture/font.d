@@ -5,6 +5,7 @@
     Authors: Luna Nielsen
 */
 module engine.render.texture.font;
+import engine.res.skullboy;
 import bindbc.freetype;
 import std.exception;
 import std.conv : text;
@@ -41,8 +42,15 @@ private {
     }
 }
 
+private string chosenFont;
+
 /**
-    The game's public font
+    Public instance of Kosugi Maru
+*/
+Font[string] GameFonts;
+
+/**
+    The "default" font
 */
 Font GameFont;
 
@@ -63,27 +71,58 @@ void initFontSystem() {
     vp = fontShader.getUniformLocation("vp");
 
     // The game's font
-    kmSwitchFont("dragonquestfc");
+    GameFonts["KosugiMaru"] = new Font(cast(ubyte[])import("fonts/KosugiMaru.ttf"), 24);
+    GameFonts["PixelMPlus10"] = new Font(cast(ubyte[])import("fonts/PixelMPlus10.ttf"), 24);
+    GameFonts["SkullBoy"] = new Font(skullboyData, 24, 1024);
+
+    kmSwitchFont("skullboy");
 }
 
 /**
-    Switches the font between several built in fonts
-    This causes the font to be rebuilt
+    Get the default size for the specified font
+*/
+int kmGetDefaultFontSizeFor(string name) {
+    switch(name) {
+        case "KosugiMaru": return 24;
+        case "PixelMPlus10": return 10;
+        case "SkullBoy": return 16;
+        default: return 16;
+    }
+}
+
+/**
+    Gets the default size for the current default font
+*/
+int kmGetDefaultFontSize() {
+    switch(chosenFont) {
+        case "kosugimaru": return 24;
+        case "pixelmplus": return 10;
+        case "skullboy": return 16;
+        default: return 16;
+    }
+}
+
+/**
+    Switch the default font
 */
 void kmSwitchFont(string name) {
-    import engine.res.skullboy : skullboyData;
+    chosenFont = name;
     switch(name) {
-        case "kosugimaru":
-            GameFont = new Font(cast(ubyte[])import("fonts/KosugiMaru.ttf"), 24);
+        case "kosugimaru": 
+            GameFont = GameFonts["KosugiMaru"];
             break;
-
-        case "dragonquestfc":
-            GameFont = new Font(cast(ubyte[])import("fonts/DragonQuestFC.ttf"), 24);
+        
+        case "pixelmplus":
+            GameFont = GameFonts["PixelMPlus10"];
             break;
 
         case "skullboy":
-        default:
-            GameFont = new Font(skullboyData, 24);
+            GameFont = GameFonts["SkullBoy"];
+            break;
+
+        default: 
+            GameFont = GameFonts["PixelMPlus10"];
+            chosenFont = "pixelmplus";
             break;
     }
 }

@@ -131,7 +131,7 @@ public:
     */
     vec2i actualPosition() {
         return vec2i(
-            cast(int)(position.x+surface.area.x),
+            cast(int)(surface.area.x+position.x),
             cast(int)(position.y+(surface.area.y-surface.getScroll()))
         );
     }
@@ -169,12 +169,12 @@ public:
     /**
         Tell the widget it has been hovered over
     */
-    final void hover() { onHover(); }
+    final void hover() { this.setState(WidgetState.Hover); onHover(); }
 
     /**
         Tell the wiget that we have left them
     */
-    final void leave() { onLeave(); }
+    final void leave() { this.setState(WidgetState.Normal); onLeave(); }
 
     /**
         Calculate and get size of widget

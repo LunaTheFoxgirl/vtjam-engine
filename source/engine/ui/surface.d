@@ -30,6 +30,8 @@ public static:
         Updates the last surface
     */
     void update() {
+        if (surfaces.count == 0) return;
+        
         surfaces.back().update();
     }
 

@@ -15,6 +15,15 @@ private:
 public:
 
     /**
+        Sets the font size
+    */
+    void setFontSize(int fontSize) {
+        this.fontSize = fontSize;
+        GameFont.setSize(fontSize);
+        boxSize = GameFont.measure(this.label);
+    }
+
+    /**
         Sets the text of the label
     */
     void setText(string text) {

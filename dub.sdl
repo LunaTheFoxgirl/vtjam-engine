@@ -16,7 +16,19 @@ dependency "asdf" version="~>0.7.5"
 targetPath "out/"
 libs "vorbisfile" "ogg" "vorbis"
 sourceFiles "libs/ogg.lib" "libs/vorbisfile.lib" "libs/vorbis.lib" platform="windows"
-copyFiles "libs/COPYING-FreeType" "libs/COPYING-XIPH" "libs/COPYING-OpenALSoft" "libs/README-SDL.txt" "res/fonts/LICENSE-KosugiMaru.txt"
+copyFiles "libs/COPYING-FreeType" "libs/COPYING-XIPH" "libs/COPYING-OpenALSoft" "libs/README-SDL.txt" "res/fonts/LICENSE-KosugiMaru.txt" "res/fonts/LICENSE-PixelMPlus10.txt"
 copyFiles "libs/libvorbis.dll" "libs/libvorbisfile.dll" "libs/freetype.dll" "libs/OpenAL32.dll" "libs/SDL2.dll" platform="windows"
 versions "GL_33" "SDL_2012"
 stringImportPaths "res/"
+
+configuration "default" {
+    targetType "executable"
+}
+
+configuration "release" {
+    targetType "executable"
+
+    // On Windows hide the command prompt unless invoked from a command prompt
+    lflags "/SUBSYSTEM:windows" "/ENTRY:mainCRTStartup" platform="windows"
+}
+//

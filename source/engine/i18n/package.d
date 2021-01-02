@@ -7,6 +7,7 @@
     Authors: Luna Nielsen
 */
 module engine.i18n;
+import engine;
 import std.exception;
 import asdf;
 
@@ -19,6 +20,7 @@ private struct transidx {
 // The language file serialization construct
 private struct LangFile {
     string name;
+    string font;
     string[string] table;
 }
 
@@ -51,7 +53,7 @@ private void genLangList() {
 /**
     Gets a list of the languages currently available
 */
-string[] getLanguages() {
+string[] kmGetLanguages() {
     string[] langs;
     foreach(name, _; langList) {
         langs ~= name;
@@ -62,17 +64,26 @@ string[] getLanguages() {
 /**
     Sets the current language
 */
-void language(string language) {
+void kmSetLanguage(string language, bool ignoreFontSwitch = false) {
     import std.file : readText, exists;
     import std.path : buildPath, setExtension;
     import std.string : split;
     import std.conv : to;
 
-    enforce(language in langList, "Language not found");
+    transtable.clear();
+
+    if (language !in langList) {
+        if (language != "English") AppLog.warn("i18n", "Language %s not found, switching to English...");
+        if (!ignoreFontSwitch) kmSwitchFont("default");
+        return;
+    }
 
     // Read and parse the json
     string json = langList[language].readText();
     LangFile table = deserialize!LangFile(json);
+
+    // Switch font to the one specified in lang file
+    if (!ignoreFontSwitch) kmSwitchFont(table.font);
     
     // Iterate over all the keys and build the LangFile object from it
     foreach(idx, str; table.table) {
@@ -86,8 +97,7 @@ void language(string language) {
         transtable[transidx(components[0], components[1].to!int)] = str;
     }
 
-    import std.stdio : writefln;
-    debug writefln("Loaded language %s...", table.name);
+    AppLog.info("i18n", "Loaded language %s...", table.name);
 }
 
 /**
@@ -95,10 +105,12 @@ void language(string language) {
 */
 string _(string file=__FILE__, int line = __LINE__)(string text) {
 
+    import std.path : baseName;
+
     // No translation was loaded
     if (transtable.length == 0) return text;
 
-    transidx idx = transidx(file, line);
+    transidx idx = transidx(baseName(file), line);
 
     // Line was not found in translation
     if (idx !in transtable) return text;
@@ -109,5 +121,4 @@ string _(string file=__FILE__, int line = __LINE__)(string text) {
 
 shared static this() {
     genLangList();
-    language("English");
 }
