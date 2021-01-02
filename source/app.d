@@ -2,9 +2,11 @@ module app;
 import engine;
 import config;
 import game;
+import std.format;
 
 void _init() {
     if (!kmLoadConfig()) GameStateManager.push(new LanguageSelectState);
+    else GameStateManager.push(new InGameState);
 }
 
 void _update() {
@@ -27,6 +29,9 @@ void _border() {
 
 void _postUpdate() {
 
+    UI.resetTextSize();
+    GameFont.draw("%sms"d.format(cast(int)(deltaTime()*100)), vec2(4, 4));
+    GameFont.flush();
 }
 
 int main() {

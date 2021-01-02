@@ -50,7 +50,7 @@ public:
         if (!this.shouldTakeInput()) return;
 
         // Activate the button if enter is pressed
-        if (UI.isKeyPressed(Key.KeyReturn)) activate();
+        if (UI.isKeyPressed(Key.KeyReturn) || UI.isKeyPressed(Key.KeyZ)) activate();
     }
 
     override void onDraw() {

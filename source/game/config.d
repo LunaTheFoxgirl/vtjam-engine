@@ -5,6 +5,7 @@ import std.file;
 import std.string;
 import std.utf;
 import asdf;
+import config;
 
 version(posix) {
     string getGameConfigFolder() {
@@ -77,4 +78,16 @@ class Config {
         Game's language
     */
     string lang;
+
+    /**
+        Music volume
+    */
+    @serdeOptional
+    float musicVolume = BaseMusicVolume;
+
+    /**
+        SFX volume
+    */
+    @serdeOptional
+    float sfxVolume = BaseSFXVolume;
 }

@@ -24,7 +24,7 @@ public static:
         Pops a surface off the stack
     */
     void pop() {
-        surfaces.popBack;
+        if (surfaces.count > 0) surfaces.popBack;
     }
 
     void block() {
@@ -79,14 +79,16 @@ private {
     Play selection sound
 */
 void kmPlaySelect() {
-    sfxSelect.play();
+    import config : BaseSFXVolume;
+    sfxSelect.play(BaseSFXVolume);
 }
 
 /**
     Play move sound
 */
 void kmPlayMove() {
-    sfxMove.play();
+    import config : BaseSFXVolume;
+    sfxMove.play(BaseSFXVolume);
 }
 
 /**

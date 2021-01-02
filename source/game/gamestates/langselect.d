@@ -94,14 +94,17 @@ public:
             if (fade < 0.001) {
                 GameStateManager.pop();
                 SurfaceStack.pop();
+
+                AppLog.info("Language Select", "Moved to Ingame state");
+                GameStateManager.push(new InGameState);
             }
         } else {
             fade = dampen(fade, 1, 0.004, 1);
         }
+        
         selectLanguageLabel.color.w = fade;
         englishButton.color.w = fade;
         japaneseButton.color.w = fade;
-
     }
 
     override void draw() {

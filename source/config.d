@@ -5,7 +5,16 @@
 */
 module config;
 
+/*
+    GENERAL CONFIG
+*/
 
+enum BaseMusicVolume = 0.5;
+enum BaseSFXVolume = 0.5;
+
+/*
+    VIEWPORT CONFIGURATION
+*/
 
 /**
     Size of a tile
@@ -37,8 +46,26 @@ enum PlayfieldHeight = TileSizeRatio*TileCountY;
 */
 enum StatusPageWidth = TileSizeRatio*16;
 
-/*
-    Ahead-of-time calculations for the viewport based on previous parameters
-*/
+
+// Ahead-of-time calculations for the viewport based on previous parameters
 enum TARGET_WIDTH = PlayfieldWidth+StatusPageWidth;
 enum TARGET_HEIGHT = PlayfieldHeight;
+
+
+
+
+
+/*
+    PLAYER CONFIGURATION
+*/
+
+
+/**
+    The speed of the player
+*/
+enum PlayerSpeed = 15.0;
+
+/**
+    How many bombs the player can carry
+*/
+enum BombCountLimit = 5;

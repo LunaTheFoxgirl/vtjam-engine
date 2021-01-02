@@ -56,7 +56,7 @@ void startGame(vec2i viewportSize = vec2i(1920, 1080)) {
         SDL_PumpEvents();
         UI.update();
 
-        currentTime_ = cast(double)SDL_GetPerformanceCounter()/cast(double)SDL_GetPerformanceFrequency();
+        currentTime_ = (cast(double)SDL_GetPerformanceCounter()/cast(double)SDL_GetPerformanceFrequency())*10;
         deltaTime_ = currentTime_-previousTime_;
         previousTime_ = currentTime_;
         
@@ -104,6 +104,9 @@ void startGame(vec2i viewportSize = vec2i(1920, 1080)) {
 
     // Pop all states
     GameStateManager.popAll();
+
+    // Stop all music
+    kmStopAllMusic();
 
     // Game cleanup
     gameCleanup();
