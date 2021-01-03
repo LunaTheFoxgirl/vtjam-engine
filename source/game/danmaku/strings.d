@@ -2,10 +2,10 @@ module game.danmaku.strings;
 import engine;
 
 void gameLoadStrings() {
-    GameString_Graze = _("GRAZE");
+    GameString_Graze = toEngineString(_("%sX GRAZE"));
 }
 
 /**
     String for Graze text
 */
-string GameString_Graze;
+dstring GameString_Graze;

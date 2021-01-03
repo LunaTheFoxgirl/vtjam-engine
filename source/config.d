@@ -12,10 +12,10 @@ module config;
 /**
     Speed multiplier
 */
-enum SPEED_MULT = 60;
+enum SPEED_MULT = 60.0;
 
-enum BaseMusicVolume = 0; //0.5;
-enum BaseSFXVolume = 0; //0.5;
+enum BaseMusicVolume = 0.5;
+enum BaseSFXVolume = 0.5;
 
 /*
     VIEWPORT CONFIGURATION
@@ -58,6 +58,14 @@ enum TARGET_HEIGHT = PlayfieldHeight;
 
 
 
+/*
+    ENEMY CONFIGURATION
+*/
+
+/**
+    How long the enemy will stay invicible for after getting hit
+*/
+enum EnemyIFrameTime = 0.2;
 
 
 /*
@@ -90,6 +98,11 @@ enum PlayerBulletCooldown = 0.10;
 enum PlayerGrazeCooldown = 5;
 
 /**
+    How long the player is invincible for after getting hit
+*/
+enum PlayerIFrames = 2;
+
+/**
     Cooldown before bomb dissapates
 */
 enum PlayerBombCooldown = 5;
@@ -107,4 +120,44 @@ enum PlayerHitCircleRadius = 2.0;
 /**
     Distance from the player center that graze can happen
 */
-enum PlayerGrazeCircleRadius = 4.0;
+enum PlayerGrazeCircleRadius = 8.0;
+
+
+
+
+
+/*
+    SCORING
+*/
+
+/**
+    Amount you score for grazing
+*/
+enum GrazeScoreAmount = 1000;
+
+/**
+    Amount you score for defeating an enemy
+*/
+enum EnemyDeathScoreAmount = 10_000;
+
+/**
+    Amount you score for killing a boss
+*/
+enum BossDeathScoreAmount = 100_000;
+
+/**
+    Score multiplier that gets applied to the player
+    during a graze
+*/
+enum GrazeScoreMultiplier = 2;
+
+/**
+    How many seconds after a graze and other multiplier events
+    that score can be nullified
+*/
+enum ScoreSubtractionNullifcationCooldown = 5;
+
+/**
+    After the fact bonus score
+*/
+enum GrazeBonusScore = 100_000;

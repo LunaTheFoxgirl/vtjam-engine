@@ -18,7 +18,7 @@ public:
     }
 
     override void draw() {
-        kmClearColor(vec4(0.7, 0.7, 0.7, 1));
+        kmClearColor(vec4(0.2, 0.2, 0.2, 1));
         stage.draw();
     }
 }

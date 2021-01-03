@@ -3,7 +3,9 @@ import engine;
 import game;
 import config;
 import std.random;
-
+/**
+    Music manager for stage
+*/
 class StageMusicManager {
 private:
     Music[] tracks;
@@ -26,7 +28,7 @@ public:
         currentTrack %= tracks.length;
 
         tracks[currentTrack].setLooping(true);
-        tracks[currentTrack].play(BaseMusicVolume);
+        tracks[currentTrack].play(GlobalConfig.musicVolume);
     }
 }
 
@@ -43,6 +45,11 @@ private:
     StageMusicManager musicManager;
 
 public:
+    /**
+        Director of enemies
+    */
+    EnemyDirector enemyDirector;
+
     /**
         The bullet buffer for enemies
     */
@@ -65,41 +72,58 @@ public:
         StageInstance = this;
 
         initBulletTexture();
+        gameLoadStrings();
         player = new Player(this);
 
         // Instantiate the bullet buffers (they're classes, since we want this on the heap)
         enemyBullets = new BulletBuffer!(2000);
         playerBullets = new BulletBuffer!(500);
+        enemyDirector = new EnemyDirector(
+            [
+                WaveInfo(
+                    [
+                        SpawnInfo("bminion", 4),
+                        SpawnInfo("aminion", 10)
+                    ],
+                    SpawnMode.Multiple,
+                    2
+                ),
+                WaveInfo(
+                    [
+                        SpawnInfo("bminion", 10),
+                        SpawnInfo("bminion", 10),
+                    ],
+                    SpawnMode.Multiple,
+                    3
+                ),
+                WaveInfo(
+                    [
+                        SpawnInfo("bminion", 10),
+                        SpawnInfo("bminion", 10),
+                        SpawnInfo("aminion", 10),
+                        SpawnInfo("aminion", 10),
+                    ],
+                    SpawnMode.Multiple,
+                    4
+                )
+            ]
+        );
 
         musicManager = new StageMusicManager([new Music("assets/bgm/bgm1.ogg")]);
         musicManager.nextTrack();
     }
 
-    int testCooldown = 1;
     /**
         Updates the map
     */
     void update() {
         player.update();
 
-        testCooldown--;
-        if (testCooldown <= 0) {
-            testCooldown = 2;
-
-            enemyBullets.spawnBullet(new TestBullet(vec2(
-                uniform(0, PlayfieldWidth),
-                0
-            ),
-            vec2(
-                0,
-                -0.05
-            )));
-        }
-
         // Note: We want enemy bullets to deal damage to the player
         // before the player can deal damage to the enemy
         enemyBullets.update();
         playerBullets.update();
+        enemyDirector.update();
     }
 
     /**
@@ -107,15 +131,16 @@ public:
     */
     void draw() {
 
-        // NOTE: We want these to appear under the enemy bullets, 
-        // hence we draw them first
+        // NOTE: We want bullets to appear underneath enemies and player
+        // Hence we draw them first
         playerBullets.draw();
+        enemyBullets.draw();
 
         // Player draws ontop of bullets
         player.draw();
 
-        // And finally enemy bullets draw ontop of player
-        enemyBullets.draw();
+        // Draw enemies over bullets
+        enemyDirector.draw();
 
         // TODO: make proper UI
         player.lateDraw();

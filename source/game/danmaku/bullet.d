@@ -67,7 +67,7 @@ public:
 /**
     A bullet
 */
-class Bullet {
+abstract class Bullet {
 public:
     /**
         Spawns bullet at position
@@ -96,6 +96,11 @@ public:
     bool alive;
 
     /**
+        Whether the bullet has been grazed against
+    */
+    bool hasGrazed;
+
+    /**
         Position of bullet
     */
     vec2 position;
@@ -114,14 +119,16 @@ public:
         Update the bullet
     */
     void update() {
-        this.position = vec2(round(position.x), round(position.y));
-        
-        // Kill bullet if outside play area
-        if (position.x < 0 || position.x > PlayfieldWidth ||
-            position.y < 0 || position.y > PlayfieldHeight) alive = false;
+        //this.position = vec2(round(position.x), round(position.y));
+
+        // Kill bullet if outside play area (and somewhat invisible)
+        // 4 pixels added for good measure
+        float size = (hitRadius*2)+4;
+        if (position.x < -size || position.x > PlayfieldWidth+size ||
+            position.y < -size || position.y > PlayfieldHeight+size) alive = false;
 
         // Handle damaging the player if we're not a player bullet
-        if (!isPlayerBullet && this.collidesWithPlayer()) {
+        if (!isPlayerBullet && this.collidesWithPlayer() && !StageInstance.player.isInvincible()) {
             StageInstance.player.hit();
             this.alive = false;
         }
@@ -137,9 +144,7 @@ public:
     /**
         Draw the bullet
     */
-    void draw() {
-        GameBatch.draw(GameAtlas["bullets"], vec4(position.x, position.y, 16, 16), vec4(0, 0, 16, 16), vec2(8, 8), rot);
-    }
+    abstract void draw();
 }
 
 void initBulletTexture() {

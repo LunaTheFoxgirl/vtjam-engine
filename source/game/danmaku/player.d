@@ -9,13 +9,23 @@ import std.format;
 */
 class Player {
 private:
+    static Sound shootSFX;
+    static Sound deathSFX;
+
+    // Stores last score amount
+    long lastScore;
+
+    // Graze multiplier
+    int grazeMultiplier;
 
     Stage stage;
     KeyboardState* state;
-    AtlasIndex playerSprite;
 
+    float iFrames = 0;
     float fireCooldown = 0;
     float bombCooldown = 0;
+    float grazeCooldown = 0;
+    float scoreSubNullifcationCooldown = 0;
 
     void updateMovement() {
 
@@ -52,6 +62,7 @@ private:
         if (state.isKeyDown(Key.KeyX) && bombCooldown < 0 && bombs > 0) {
             bombs--;
             bombCooldown = PlayerBombCooldown;
+            iFrames = PlayerBombCooldown+(PlayerIFrames/2);
         }
         
         if (bombCooldown > 0) {
@@ -74,11 +85,83 @@ private:
         if (state.isKeyDown(Key.KeyZ) && fireCooldown < 0) {
             fireCooldown = PlayerBulletCooldown;
 
+            shootSFX.play(GlobalConfig.sfxVolume);
+
             stage.playerBullets.spawnBullet(new PlayerBullet(vec2(position.x - 4, position.y), vec2(0, 1)));
             stage.playerBullets.spawnBullet(new PlayerBullet(vec2(position.x + 4, position.y), vec2(0, 1)));
             stage.playerBullets.spawnBullet(new PlayerBullet(vec2(position.x - 8, position.y), vec2(0.1, 1)));
             stage.playerBullets.spawnBullet(new PlayerBullet(vec2(position.x + 8, position.y), vec2(-0.1, 1)));
         }
+    }
+
+    void updateGraze() {
+
+        // We need these variables to check between state changes of the cooldowns
+        float lastGrazeCooldown = grazeCooldown;
+        float lastScoreSubNullCooldown = scoreSubNullifcationCooldown;
+
+
+        if (grazeCooldown >= 0) grazeCooldown -= deltaTime();
+        if (scoreSubNullifcationCooldown >= 0) scoreSubNullifcationCooldown -= deltaTime();
+
+        // Handle graze score subtraction cooldown
+        if (lastGrazeCooldown >= 0 && grazeCooldown < 0) {
+            scoreSubNullifcationCooldown = ScoreSubtractionNullifcationCooldown;
+        }
+
+        // If our cooldown has ended, reset lastScore
+        // hit uses this to subtract score graze might've given
+        // Hence we set it to 0.
+        if (lastScoreSubNullCooldown >= 0 && scoreSubNullifcationCooldown < 0) {
+            lastScore = 0;
+        }
+
+        if (grazeCooldown < 0) {
+            Bullet[] buff = stage.enemyBullets.getBuffer();
+
+            foreach(bullet; buff) {
+
+                // Skip nonexistant and dead bullets
+                if (bullet is null || !bullet.alive || bullet.hasGrazed) continue;
+
+                if (position.distance(bullet.position) <= PlayerGrazeCircleRadius+bullet.hitRadius) {
+                    grazeCooldown = PlayerGrazeCooldown;
+                    bullet.hasGrazed = true;
+                    statusTextDecay = 3;
+                    grazeMultiplier++;
+                    if (grazeMultiplier > GrazeBonus) GrazeBonus = grazeMultiplier;
+                    this.score(1000);
+                    
+                    // We don't need to continue the loop nor anything
+                    // else if we've already found a bullet that we
+                    // can graze against
+                    return;
+                }
+            }
+        }
+    }
+
+    // TODO: make a text particle system
+
+    float statusTextDecay = 0;
+    void drawStatusText() {
+
+        statusTextDecay -= deltaTime();
+
+        // Status strings
+        UI.resetTextSize();
+        vec2 grazeTextSize = GameFont.measure(GameString_Graze.format(grazeMultiplier));
+        GameFont.draw(
+            GameString_Graze.format(grazeMultiplier), 
+            vec2(position.x-(grazeTextSize.x/2), position.y - 32 - (statusTextDecay < 1 ? 8-(statusTextDecay * 8) : 0)), 
+            vec4(1, 1, 1, statusTextDecay)
+        );
+
+        GameFont.flush();
+    }
+
+    int calcScoreMultiplier() {
+        return (grazeCooldown > 0 ? grazeMultiplier+1 : 1);
     }
 
 public:
@@ -89,10 +172,16 @@ public:
     this(Stage stage) {
         this.stage = stage;
 
+        this.position = vec2(PlayfieldWidth/2, PlayfieldHeight-64);
+
         if (!GameAtlas.has("player")) {
-            // Load player texture
+
+            // Load player related textures
             GameAtlas.add("player", "assets/sprites/player.png");
-            playerSprite = GameAtlas["player"];
+            GameAtlas.add("explosion", "assets/sprites/explosion.png");
+            GameAtlas.add("grazeCircle", "assets/sprites/graze-circle.png");
+            shootSFX = new Sound("assets/sfx/sfx_shoot.ogg");
+            deathSFX = new Sound("assets/sfx/sfx_death.ogg");
         }
     }
 
@@ -123,10 +212,25 @@ public:
     int lives = 10;
 
     /**
+        Gets the current damage of the player
+    */
+    int getDamage() {
+        return 10;
+    }
+
+    /**
         Whether the player is immune to attacks
     */
-    bool isImmune() {
-        return bombCooldown > 0;
+    bool isInvincible() {
+        return iFrames > 0;
+    }
+
+    /**
+        Adds score
+    */
+    void score(long score) {
+        lastScore = score * calcScoreMultiplier();
+        Score += lastScore;
     }
 
     /**
@@ -135,14 +239,26 @@ public:
     void hit() {
         
         // We're invincible while bomb is active
-        if (bombCooldown > 0) return;
+        if (isInvincible()) return;
+
+        // Subtract any score we might've gotten from graze
+        Score -= lastScore;
+        
+        // Reset values that need to be reset
+        grazeCooldown = 0;
+        grazeMultiplier = 0;
+        statusTextDecay = 0;
+        lastScore = 0;
+        iFrames = PlayerIFrames;
 
         // Decrease lives
         lives--;
 
         // TODO: Game Over condition
         if (lives <= 0) {
-
+            deathSFX.play(GlobalConfig.sfxVolume);
+            GameStateManager.pop();
+            GameStateManager.push(new GameOver);
         }
     }
 
@@ -150,11 +266,16 @@ public:
         Player logic update
     */
     void update() {
+        
+        // Handle invincibility frames
+        if (iFrames > 0) iFrames -= deltaTime();
+
         state = Keyboard.getState();
         this.updateMovement();
         this.updateItems();
         this.updateBomb();
         this.updateShooting();
+        if (!isInvincible) this.updateGraze();
         //this.position = vec2(round(position.x), round(position.y));
     }
 
@@ -162,13 +283,53 @@ public:
         Player draw
     */
     void draw() {
-        GameBatch.draw(playerSprite, vec4(position.x, position.y, 32, 32), vec4.init, vec2(16, 16), rot);
+        if (bombCooldown > 0) {
+            float bombSize = 42.0*bombCooldown;
+
+            GameBatch.draw(GameAtlas["explosion"], 
+                vec4(position.x, position.y, bombSize, bombSize), 
+                vec4.init, 
+                vec2(bombSize/2, bombSize/2)
+            );
+        }
+
+
+        GameBatch.draw(
+            GameAtlas["player"], 
+            vec4(position.x, position.y, 32, 32), 
+            vec4.init, vec2(16, 16), 
+            rot,
+            SpriteFlip.None, 
+            vec4(1, 1, 1, iFrames > 0 ? 0.5+(1+sin(currTime()*20))/4 : 1)
+        );
+
+        enum grazeCirleSize = PlayerGrazeCircleRadius*2;
+        GameBatch.draw(
+            GameAtlas["grazeCircle"], 
+            vec4(position.x, position.y, grazeCirleSize, grazeCirleSize), 
+            vec4.init, 
+            vec2(PlayerGrazeCircleRadius, PlayerGrazeCircleRadius), 
+            0,
+            SpriteFlip.None, 
+            vec4(1, 1, 1, 0.5)
+        );
         GameBatch.flush();
+
+        this.drawStatusText();
     }
 
     void lateDraw() {
         GameFont.setSize(kmGetDefaultFontSize()*2);
-        GameFont.draw("HP: %s\nBOMBS: %s"d.format(lives, bombs), vec2(8, 8), vec4(1.0, 0, 0, 1));
+        GameFont.draw(
+            "HP: %s\nBOMBS: %s\nSCORE: %s%s"d.format(
+                lives, 
+                bombs, 
+                Score, 
+                lastScore > 0 ? " +%s"d.format(lastScore) : ""
+            ), 
+            vec2(8, 8), 
+            vec4(1.0, 0, 0, 1)
+        );
         GameFont.flush();
     }
 }
