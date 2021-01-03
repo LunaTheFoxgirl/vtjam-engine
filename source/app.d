@@ -32,9 +32,11 @@ void _border() {
 
 void _postUpdate() {
 
-    UI.resetTextSize();
-    GameFont.draw("%sms"d.format(cast(int)(deltaTime()*1000)), vec2(4, 4));
-    GameFont.flush();
+    debug {
+        UI.resetTextSize();
+        GameFont.draw("%sms"d.format(cast(int)(deltaTime()*1000)), vec2(4, 4));
+        GameFont.flush();
+    }
 }
 
 int main() {
