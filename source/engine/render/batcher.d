@@ -279,7 +279,7 @@ public:
             GL_FLOAT,
             GL_FALSE,
             DataLength*GLfloat.sizeof,
-            cast(GLvoid*)(UVSize*GLfloat.sizeof),
+            cast(GLvoid*)(VecSize*GLfloat.sizeof),
         );
 
         // Color buffer

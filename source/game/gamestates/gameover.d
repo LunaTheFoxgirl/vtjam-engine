@@ -33,7 +33,7 @@ public:
         GameFont.draw(gameOverString, vec2(8, 8));
 
         GameFont.setSize(kmGetDefaultFontSize());
-        GameFont.draw("%s BASE SCORE\n+%s GRAZE COMBO BONUS\nPress ENTER to retry\n\nA game by\n - Luna (@Clipsey5) | Code & Engine\n - 40Nix (@40Nix) | Music and SFX\n - Kusamochi (@Kusamochi_x) | Art"d.format(Score, getGrazeBonusScore()), vec2(8, goMeasure.y + 16));
+        GameFont.draw("%s BASE SCORE\n+%s GRAZE COMBO BONUS\nPress ENTER to retry\n\nA game by\n - Luna (@Clipsey5) | Code & Engine\n - 40Nix (@40Nix) | Music and SFX\n - Kusamochi (@Kusamochi_x) | Art\n\nBoss\n - Kitsune Spirit (@Kitsune__Spirit)"d.format(Score, getGrazeBonusScore()), vec2(8, goMeasure.y + 16));
 
         GameFont.flush();
     }
