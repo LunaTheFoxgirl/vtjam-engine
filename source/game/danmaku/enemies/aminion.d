@@ -28,7 +28,7 @@ public:
         if (!GameAtlas.has("minion")) {
             GameAtlas.add("minion", "assets/sprites/boss0.png");
         }
-        
+
         texSize = vec2(GameAtlas["minion"].area.z, GameAtlas["minion"].area.w);
         texCenter = vec2(texSize.x/2, texSize.y/2);
         
@@ -65,6 +65,8 @@ public:
                     )
                 );
             }
+            
+            this.playShootSFX();
         }
 
         if (position.y < 0) {

@@ -69,6 +69,8 @@ public:
                         )
                     )
                 );
+                
+                this.playShootSFX();
 
                 bulletsToFire--;
             }

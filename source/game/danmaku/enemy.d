@@ -72,7 +72,7 @@ private:
             if (spawnEntry >= waveInfo.length) {
                 // Handle win conditon: All enemies exhausted
                 GameStateManager.pop();
-                GameStateManager.push(new GameOver);
+                GameStateManager.push(new GameOver(true));
             }
         }
     }
@@ -87,8 +87,10 @@ private:
         // Handle win conditon: All enemies exhausted
         if (spawnEntry >= waveInfo.length && enemies.count == 0) {
             GameStateManager.pop();
-            GameStateManager.push(new GameOver);
+            GameStateManager.push(new GameOver(true));
         }
+
+        enemies.clear();
     }
 
 public:
@@ -118,6 +120,11 @@ public:
 
         // Collect any dead enemies
         foreach(i; toCollect) {
+
+            // Why would this happen?
+            if (i > enemies.count) continue;
+
+            // Try to remove enemy
             enemies.removeAt(i);
         }
     }
@@ -158,6 +165,7 @@ Enemy gameCreateEnemy(string name) {
 abstract class Enemy {
 private:
     float iFrames = 0;
+    static Sound bossKillSFX;
     static Sound damageSFX;
     static Sound killSFX;
     static Sound shootSFX;
@@ -208,6 +216,7 @@ public:
             damageSFX = new Sound("assets/sfx/sfx_damage.ogg");
             killSFX = new Sound("assets/sfx/sfx_kill.ogg");
             shootSFX = new Sound("assets/sfx/sfx_shoot.ogg");
+            bossKillSFX = new Sound("assets/sfx/sfx_bossdefeat.ogg");
         }
     }
 
@@ -257,7 +266,8 @@ public:
         if (health < 0 && alive) {
             alive = false;
 
-            killSFX.play(GlobalConfig.sfxVolume);
+            if (isBoss) bossKillSFX.play(GlobalConfig.sfxVolume);
+            else killSFX.play(GlobalConfig.sfxVolume);
 
             // Give player score
             if (!isBoss) StageInstance.player.score(EnemyDeathScoreAmount);

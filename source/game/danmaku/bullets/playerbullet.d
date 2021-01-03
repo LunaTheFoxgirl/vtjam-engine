@@ -13,7 +13,7 @@ public:
     this(vec2 position, vec2 direction) {
         super(position, direction);
         this.isPlayerBullet = true;
-        this.hitRadius = 8;
+        this.hitRadius = 4;
     }
 
     override void update() {
@@ -23,6 +23,6 @@ public:
     }
 
     override void draw() {
-        GameBatch.draw(GameAtlas["bullets"], vec4(position.x, position.y, 16, 16), vec4(0, 0, 16, 16), vec2(8, 8), rot);
+        GameBatch.draw(GameAtlas["playerbullets"], vec4(position.x, position.y, 8, 8), vec4(0, 0, 8, 8), vec2(8, 8), rot);
     }
 }

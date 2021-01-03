@@ -8,27 +8,28 @@ import std.random;
 */
 class StageMusicManager {
 private:
-    Music[] tracks;
-    size_t currentTrack;
+    Music[string] tracks;
+    string currentTrack;
 
 public:
-    this(Music[] tracks) {
+    this(Music[string] tracks) {
         this.tracks = tracks;
 
         // So the first call of nextTrack is always the first track
-        this.currentTrack = tracks.length-1;
+        this.currentTrack = "stage";
     }
 
     /**
         Moves to next track
     */
-    void nextTrack() {
+    void play(string name) {
+        // Stop old
         tracks[currentTrack].stop();
-        currentTrack++;
-        currentTrack %= tracks.length;
 
-        tracks[currentTrack].setLooping(true);
-        tracks[currentTrack].play(GlobalConfig.musicVolume);
+        // Start new
+        tracks[name].setLooping(true);
+        tracks[name].play(GlobalConfig.musicVolume);
+        currentTrack = name;
     }
 }
 
@@ -36,6 +37,8 @@ public:
     Global instance of the map
 */
 Stage StageInstance;
+
+StageMusicManager MusicManager;
 
 /**
     The map
@@ -105,12 +108,24 @@ public:
                     ],
                     SpawnMode.Multiple,
                     4
+                ),
+                WaveInfo(
+                    [
+                        SpawnInfo("boss", 1),
+                    ],
+                    SpawnMode.Multiple,
+                    4
                 )
             ]
         );
 
-        musicManager = new StageMusicManager([new Music("assets/bgm/bgm1.ogg")]);
-        musicManager.nextTrack();
+        musicManager = new StageMusicManager([
+            "stage": new Music("assets/bgm/bgm1.ogg"),
+            "boss": new Music("assets/bgm/bgm2.ogg"),
+        ]);
+
+        MusicManager = musicManager;
+        musicManager.play("stage");
     }
 
     /**

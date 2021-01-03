@@ -4,9 +4,16 @@ import game;
 import std.format;
 
 class GameOver : GameState {
+private:
+    bool won;
+
 public:
+    this(bool won) {
+        this.won = won;
+    }
 
     override void onActivate() {
+        kmStopAllMusic();
     }
 
     override void update() {
@@ -21,12 +28,12 @@ public:
 
     override void draw() {
         GameFont.setSize(kmGetDefaultFontSize()*2);
-        dstring gameOverString = "GAME OVER\n%s"d.format(getFinalScore());
+        dstring gameOverString = "GAME OVER%s\n%s"d.format(won ? " (YOU WON!)" : "", getFinalScore());
         vec2 goMeasure = GameFont.measure(gameOverString);
         GameFont.draw(gameOverString, vec2(8, 8));
 
         GameFont.setSize(kmGetDefaultFontSize());
-        GameFont.draw("%s BASE SCORE\n+%s GRAZE COMBO BONUS\nPress ENTER to retry"d.format(Score, getGrazeBonusScore()), vec2(8, goMeasure.y + 8));
+        GameFont.draw("%s BASE SCORE\n+%s GRAZE COMBO BONUS\nPress ENTER to retry\n\nA game by\n - Luna (@Clipsey5) | Code & Engine\n - 40Nix (@40Nix) | Music and SFX\n - Kusamochi (@Kusamochi_x) | Art"d.format(Score, getGrazeBonusScore()), vec2(8, goMeasure.y + 16));
 
         GameFont.flush();
     }

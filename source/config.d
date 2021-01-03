@@ -120,7 +120,7 @@ enum PlayerHitCircleRadius = 2.0;
 /**
     Distance from the player center that graze can happen
 */
-enum PlayerGrazeCircleRadius = 8.0;
+enum PlayerGrazeCircleRadius = 10.0;
 
 
 
@@ -143,7 +143,7 @@ enum EnemyDeathScoreAmount = 10_000;
 /**
     Amount you score for killing a boss
 */
-enum BossDeathScoreAmount = 100_000;
+enum BossDeathScoreAmount = 1_000_000;
 
 /**
     Score multiplier that gets applied to the player

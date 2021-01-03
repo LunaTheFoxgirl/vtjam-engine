@@ -124,8 +124,8 @@ public:
         // Kill bullet if outside play area (and somewhat invisible)
         // 4 pixels added for good measure
         float size = (hitRadius*2)+4;
-        if (position.x < -size || position.x > PlayfieldWidth+size ||
-            position.y < -size || position.y > PlayfieldHeight+size) alive = false;
+        if (position.x < -PlayfieldWidth || position.x > PlayfieldWidth+PlayfieldWidth ||
+            position.y < -PlayfieldHeight || position.y > PlayfieldHeight+PlayfieldHeight) alive = false;
 
         // Handle damaging the player if we're not a player bullet
         if (!isPlayerBullet && this.collidesWithPlayer() && !StageInstance.player.isInvincible()) {
@@ -150,5 +150,6 @@ public:
 void initBulletTexture() {
     if (!GameAtlas.has("bullets")) {
         GameAtlas.add("bullets", "assets/sprites/shitty_bullets.png");
+        GameAtlas.add("playerbullets", "assets/sprites/playerbullets.png");
     }
 }

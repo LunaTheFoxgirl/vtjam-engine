@@ -27,10 +27,20 @@ private:
     float grazeCooldown = 0;
     float scoreSubNullifcationCooldown = 0;
 
+    int frame = 0;
+    int fTm = 5;
+
     void updateMovement() {
 
         float slowDown = state.isKeyDown(Key.KeyLeftShift) ? PlayerSlowFactor : 1;
         rot = 0;
+
+        // Player animation
+        if (fTm > 0) fTm--;
+        if (fTm <= 0) {
+            fTm = 5;
+            frame = (frame+1)%4;
+        }
         
 
         // Horizontal movement
@@ -63,6 +73,7 @@ private:
             bombs--;
             bombCooldown = PlayerBombCooldown;
             iFrames = PlayerBombCooldown+(PlayerIFrames/2);
+            deathSFX.play(GlobalConfig.sfxVolume);
         }
         
         if (bombCooldown > 0) {
@@ -75,6 +86,7 @@ private:
 
                 if (position.distance(bullet.position) <= bombRadius+bullet.hitRadius) {
                     bullet.alive = false;
+                    shootSFX.play(GlobalConfig.sfxVolume);
                 }
             }
         }
@@ -194,7 +206,7 @@ public:
         Player's bomb count, can max have 255 bombs
         (this will be soft limited to BombCountLimit)
     */
-    ubyte bombs = 1;
+    ubyte bombs = BombCountLimit;
 
     /**
         The player's position on the screen
@@ -215,7 +227,7 @@ public:
         Gets the current damage of the player
     */
     int getDamage() {
-        return 10;
+        return 10 * (grazeMultiplier > 1 ? 2 : 1);
     }
 
     /**
@@ -258,7 +270,7 @@ public:
         if (lives <= 0) {
             deathSFX.play(GlobalConfig.sfxVolume);
             GameStateManager.pop();
-            GameStateManager.push(new GameOver);
+            GameStateManager.push(new GameOver(false));
         }
     }
 
@@ -297,7 +309,13 @@ public:
         GameBatch.draw(
             GameAtlas["player"], 
             vec4(position.x, position.y, 32, 32), 
-            vec4.init, vec2(16, 16), 
+            vec4(
+                frame*32,
+                0,
+                32,
+                32
+            ), 
+            vec2(16, 16), 
             rot,
             SpriteFlip.None, 
             vec4(1, 1, 1, iFrames > 0 ? 0.5+(1+sin(currTime()*20))/4 : 1)
@@ -311,7 +329,7 @@ public:
             vec2(PlayerGrazeCircleRadius, PlayerGrazeCircleRadius), 
             0,
             SpriteFlip.None, 
-            vec4(1, 1, 1, 0.5)
+            vec4(1, 1, 1, 0.2)
         );
         GameBatch.flush();
 
