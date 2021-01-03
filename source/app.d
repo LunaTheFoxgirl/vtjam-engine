@@ -8,8 +8,8 @@ void _init() {
     if (!kmLoadConfig()) GameStateManager.push(new LanguageSelectState);
     else GameStateManager.push(new InGameState);
 
-    GameWindow.title = "Bullet Hell";
-    GameWindow.setSwapInterval(SwapInterval.Adaptive);
+    GameWindow.title = "ダンマク＃１";
+    GameWindow.setSwapInterval(SwapInterval.VSync);
 }
 
 void _update() {

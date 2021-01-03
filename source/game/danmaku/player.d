@@ -180,7 +180,7 @@ private:
     }
 
     int calcScoreMultiplier() {
-        return (grazeCooldown > 0 ? grazeMultiplier+1 : 1);
+        return (grazeMultiplier > 0 ? grazeMultiplier+1 : 2);
     }
 
 public:
@@ -344,13 +344,13 @@ public:
     }
 
     void lateDraw() {
-        GameFont.setSize(kmGetDefaultFontSize()*2);
+        GameFont.setSize(kmGetDefaultFontSize());
         GameFont.draw(
-            "HP: %s\nBOMBS: %s\nSCORE: %s%s"d.format(
-                lives, 
-                bombs, 
+            "SCORE: %s%s\nBOMBS: %s\nHP: %s\n"d.format(
                 Score, 
-                lastScore > 0 ? " +%s"d.format(lastScore) : ""
+                lastScore > 0 ? " +%s"d.format(lastScore) : "",
+                bombs, 
+                lives, 
             ), 
             vec2(8, 8), 
             vec4(1.0, 0, 0, 1)

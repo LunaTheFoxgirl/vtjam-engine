@@ -46,6 +46,7 @@ StageMusicManager MusicManager;
 class Stage {
 private:
     StageMusicManager musicManager;
+    Texture bg;
 
 public:
     /**
@@ -73,6 +74,10 @@ public:
     */
     this() {
         StageInstance = this;
+
+        bg = new Texture("assets/sprites/bg.png");
+        bg.setWrapping(Wrapping.Repeat);
+        bg.setFiltering(Filtering.Point);
 
         initBulletTexture();
         gameLoadStrings();
@@ -145,6 +150,11 @@ public:
         Draws the map
     */
     void draw() {
+        GameBatch.draw(
+            bg, 
+            vec4(0, 0, PlayfieldWidth, PlayfieldHeight),
+            vec4(0, -(currTime()*SPEED_MULT), PlayfieldWidth, PlayfieldHeight)
+        );
 
         // NOTE: We want bullets to appear underneath enemies and player
         // Hence we draw them first
