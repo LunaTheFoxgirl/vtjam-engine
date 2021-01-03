@@ -22,6 +22,6 @@ public:
     }
 
     override void draw() {
-        GameBatch.draw(GameAtlas["bullets"], vec4(position.x, position.y, 16, 16), vec4(16, 0, 16, 16), vec2(8, 8), rot);
+        GameBatch.draw(GameAtlas["bullets"], vec4(position.x, position.y, 16, 16), vec4.init, vec2(8, 8), rot);
     }
 }

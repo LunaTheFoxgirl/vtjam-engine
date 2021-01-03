@@ -149,7 +149,7 @@ public:
 
 void initBulletTexture() {
     if (!GameAtlas.has("bullets")) {
-        GameAtlas.add("bullets", "assets/sprites/shitty_bullets.png");
+        GameAtlas.add("bullets", "assets/sprites/enemybullet.png");
         GameAtlas.add("playerbullets", "assets/sprites/playerbullets.png");
     }
 }

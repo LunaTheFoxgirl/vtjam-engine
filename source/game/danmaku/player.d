@@ -27,15 +27,20 @@ private:
     float grazeCooldown = 0;
     float scoreSubNullifcationCooldown = 0;
 
+    int anim = 0;
     int frame = 0;
     int fTm = 5;
+    bool inFocus;
 
     void updateMovement() {
 
+        inFocus = state.isKeyDown(Key.KeyLeftShift);
         float slowDown = state.isKeyDown(Key.KeyLeftShift) ? PlayerSlowFactor : 1;
         rot = 0;
+        
 
         // Player animation
+        anim = 0;
         if (fTm > 0) fTm--;
         if (fTm <= 0) {
             fTm = 5;
@@ -45,10 +50,12 @@ private:
 
         // Horizontal movement
         if (state.isKeyDown(Key.KeyLeft)) {
+            anim = 1;
             rot = radians(345);
             position.x -= (PlayerSpeed/slowDown)*deltaTime();
         }
         if (state.isKeyDown(Key.KeyRight)) {
+            anim = 2;
             rot = radians(15);
             position.x += (PlayerSpeed/slowDown)*deltaTime();
         }
@@ -311,12 +318,12 @@ public:
             vec4(position.x, position.y, 32, 32), 
             vec4(
                 frame*32,
-                0,
+                anim*32,
                 32,
                 32
             ), 
             vec2(16, 16), 
-            rot,
+            inFocus ? 0 : rot,
             SpriteFlip.None, 
             vec4(1, 1, 1, iFrames > 0 ? 0.5+(1+sin(currTime()*20))/4 : 1)
         );
